@@ -39,8 +39,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun loadPosts() {
         _data.value = FeedModel(loading = true)
         repository.getAllAsync(object : PostRepository.PostCallback<List<Post>> {
-            override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+            override fun onSuccess(value: List<Post>) {
+                _data.postValue(FeedModel(posts = value, empty = value.isEmpty()))
             }
 
             override fun onError(e: Exception) {
@@ -50,15 +50,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun save() {
-
         edited.value?.let {
             repository.saveAsync(it, object : PostRepository.PostCallback<Post> {
-                override fun onSuccess(post: Post) {
+                override fun onSuccess(value: Post) {
                     _postCreated.postValue(Unit)
                 }
 
                 override fun onError(e: Exception) {
                     _data.postValue(FeedModel(error = true))
+                    _postCreated.postValue(Unit)
                 }
             })
         }
@@ -79,12 +79,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         repository.likeByIdAsync(id, object : PostRepository.PostCallback<Post> {
-            override fun onSuccess(post: Post) {
+            override fun onSuccess(value: Post) {
                 val posts = _data.value?.posts.orEmpty().map { postnew ->
                     if (postnew.id == id) {
                         postnew.copy(
-                            likedByMe = post.likedByMe,
-                            likes = post.likes
+                            likedByMe = value.likedByMe,
+                            likes = value.likes
                         )
                     } else {
                         postnew
@@ -107,9 +107,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             )
         )
         try {
-            repository.removeByIdAsync(id, object : PostRepository.PostCallback<Long> {})
+            repository.removeByIdAsync(id, object : PostRepository.PostCallback<Unit> {
+                override fun onError(e: Exception) {
+                    _data.postValue(_data.value?.copy(posts = old))
+                    _data.postValue(FeedModel(error = true))
+                }
+            })
         } catch (e: IOException) {
-            _data.postValue(_data.value?.copy(posts = old))
+            _data.postValue(_data.value?.copy(posts = old, error = true))
         }
     }
 }
