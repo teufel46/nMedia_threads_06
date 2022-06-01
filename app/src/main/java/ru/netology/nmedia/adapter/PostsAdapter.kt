@@ -44,7 +44,6 @@ class PostViewHolder(
             author.text = post.author
             published.text = post.published.toString()
             content.text = post.content
-            // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
 
