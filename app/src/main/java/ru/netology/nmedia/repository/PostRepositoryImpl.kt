@@ -21,7 +21,7 @@ class PostRepositoryImpl : PostRepository {
             }
 
             override fun onFailure(call: Call<List<Post>>, t: Throwable) {
-                TODO("Not yet implemented")
+                callback.onError(RuntimeException("error"))
             }
         })
     }
@@ -39,7 +39,7 @@ class PostRepositoryImpl : PostRepository {
             }
 
             override fun onFailure(call: Call<Post>, t: Throwable) {
-                TODO("Not yet implemented")
+                callback.onError(RuntimeException("error"))
             }
         })
     }
@@ -57,7 +57,7 @@ class PostRepositoryImpl : PostRepository {
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-                TODO("Not yet implemented")
+                callback.onError(RuntimeException("error"))
             }
 
         })
@@ -76,7 +76,7 @@ class PostRepositoryImpl : PostRepository {
             }
 
             override fun onFailure(call: Call<Post>, t: Throwable) {
-                TODO("Not yet implemented")
+                callback.onError(RuntimeException("error"))
             }
 
         })
@@ -100,7 +100,7 @@ class PostRepositoryImpl : PostRepository {
                         }
 
                         override fun onFailure(call: Call<Post>, t: Throwable) {
-                            TODO("Not yet implemented")
+                            callback.onError(RuntimeException("response.message())"))
                         }
 
                     })
@@ -117,11 +117,15 @@ class PostRepositoryImpl : PostRepository {
                         }
 
                         override fun onFailure(call: Call<Post>, t: Throwable) {
-                            TODO("Not yet implemented")
+                            callback.onError(RuntimeException("response.message())"))
                         }
 
                     })
                 }
+            }
+
+            override fun onError(e: Exception) {
+                callback.onError(RuntimeException("error"))
             }
         })
     }
